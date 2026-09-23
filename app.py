@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
-import plotly.express as px
 
 
 # ---------------------------------------------------------
@@ -887,6 +886,10 @@ st.dataframe(
     country_display,
     use_container_width=True,
     hide_index=True
+)
+
+# =========================================================
+# COUNTRY → SEGMENT ANALYSIS
 
 # =========================================================
 # COUNTRY → SEGMENT ANALYSIS
@@ -1196,7 +1199,7 @@ st.plotly_chart(
     use_container_width=True
 )
     
-)# ---------------------------------------------------------
+# ---------------------------------------------------------
 # FOOTER
 # ---------------------------------------------------------
 

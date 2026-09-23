@@ -638,14 +638,21 @@ st.dataframe(
 # INTERACTIVE WORLD MAP BY COUNTRY
 # =========================================================
 
+# =========================================================
+# INTERACTIVE WORLD MAP BY COUNTRY
+# =========================================================
+
 st.header("🌍 Interactive World Map")
 
 st.write(
-    "Explore the distribution of buyers across countries. "
-    "Use the selector below to change the metric displayed on the map."
+    "Explore buyer activity, spending, property values, "
+    "and investment behavior across countries."
 )
 
-# Country name to ISO-3 country code
+# ---------------------------------------------------------
+# COUNTRY NAME → ISO-3 CODE
+# ---------------------------------------------------------
+
 country_codes = {
     "USA": "USA",
     "UK": "GBR",
@@ -659,26 +666,58 @@ country_codes = {
     "Denmark": "DNK"
 }
 
-# Create country-level summary
+
+# ---------------------------------------------------------
+# USE FILTERED DATA
+# ---------------------------------------------------------
+
+map_data = filtered_data.copy()
+
+
+# ---------------------------------------------------------
+# COUNTRY-LEVEL SUMMARY
+# ---------------------------------------------------------
+
 country_summary = (
-    buyer_data
+    map_data
     .groupby("country")
     .agg(
         buyer_count=("client_id", "count"),
         avg_total_spend=("total_spend", "mean"),
         avg_property_price=("average_property_price", "mean"),
         avg_properties=("total_properties", "mean"),
-        avg_satisfaction=("satisfaction_score", "mean")
+        avg_satisfaction=("satisfaction_score", "mean"),
+        investment_rate=("is_investor", "mean")
     )
     .reset_index()
 )
 
-# Add ISO country codes
+
+# Convert investment rate to percentage
+country_summary["investment_rate"] = (
+    country_summary["investment_rate"] * 100
+)
+
+
+# Add ISO-3 country codes
 country_summary["iso_code"] = (
     country_summary["country"].map(country_codes)
 )
 
-# Map metric selector
+
+# ---------------------------------------------------------
+# REMOVE COUNTRIES WITHOUT ISO CODES
+# ---------------------------------------------------------
+
+country_summary = country_summary[
+    country_summary["iso_code"].notna()
+].copy()
+
+
+# ---------------------------------------------------------
+# MAP METRIC SELECTOR
+# ---------------------------------------------------------
+
 map_metric = st.selectbox(
     "Select map metric",
     [
@@ -686,60 +725,139 @@ map_metric = st.selectbox(
         "Average Total Spend",
         "Average Property Price",
         "Average Properties",
-        "Average Satisfaction"
-    ]
+        "Average Satisfaction",
+        "Investment Rate"
+    ],
+    key="country_map_metric"
 )
 
-# Match the selected option to a dataframe column
+
+# Map metric → dataframe column
 metric_mapping = {
     "Number of Buyers": "buyer_count",
     "Average Total Spend": "avg_total_spend",
     "Average Property Price": "avg_property_price",
     "Average Properties": "avg_properties",
-    "Average Satisfaction": "avg_satisfaction"
+    "Average Satisfaction": "avg_satisfaction",
+    "Investment Rate": "investment_rate"
 }
+
 
 selected_metric = metric_mapping[map_metric]
 
-# Create interactive world map
+
+# ---------------------------------------------------------
+# CREATE INTERACTIVE WORLD MAP
+# ---------------------------------------------------------
+
 fig_map = px.choropleth(
     country_summary,
+
     locations="iso_code",
+
     color=selected_metric,
+
     hover_name="country",
+
     locationmode="ISO-3",
+
     projection="natural earth",
-    color_continuous_scale="Blues"
+
+    color_continuous_scale="Blues",
+
+    custom_data=[
+        "buyer_count",
+        "avg_total_spend",
+        "avg_property_price",
+        "avg_properties",
+        "avg_satisfaction",
+        "investment_rate"
+    ]
 )
 
-# Map appearance
+
+# ---------------------------------------------------------
+# PROFESSIONAL HOVER INFORMATION
+# ---------------------------------------------------------
+
+fig_map.update_traces(
+    hovertemplate=(
+        "<b>%{hovertext}</b><br><br>"
+
+        "👥 Buyers: %{customdata[0]:,.0f}<br>"
+
+        "💰 Average Total Spend: "
+        "$%{customdata[1]:,.0f}<br>"
+
+        "🏠 Average Property Price: "
+        "$%{customdata[2]:,.0f}<br>"
+
+        "🏘️ Average Properties: "
+        "%{customdata[3]:.2f}<br>"
+
+        "⭐ Average Satisfaction: "
+        "%{customdata[4]:.2f}<br>"
+
+        "📈 Investment Rate: "
+        "%{customdata[5]:.1f}%"
+
+        "<extra></extra>"
+    )
+)
+
+
+# ---------------------------------------------------------
+# MAP DESIGN
+# ---------------------------------------------------------
+
 fig_map.update_layout(
     height=600,
+
     margin=dict(
         l=0,
         r=0,
         t=30,
         b=0
     ),
+
     geo=dict(
         showframe=False,
         showcoastlines=True,
         projection_type="natural earth"
     ),
+
     coloraxis_colorbar=dict(
         title=map_metric
     )
 )
 
-# Display map
+
+# ---------------------------------------------------------
+# DISPLAY MAP
+# ---------------------------------------------------------
+
 st.plotly_chart(
     fig_map,
     use_container_width=True
 )
 
 
-# Country summary table
-st.subheader("Country-Level Summary")
+# ---------------------------------------------------------
+# FILTER STATUS
+# ---------------------------------------------------------
+
+st.caption(
+    f"Map based on {len(map_data):,} buyers "
+    "after applying the selected dashboard filters."
+)
+
+
+# ---------------------------------------------------------
+# COUNTRY SUMMARY TABLE
+# ---------------------------------------------------------
+
+st.subheader("🌎 Country-Level Buyer Summary")
+
 
 country_display = country_summary[
     [
@@ -748,9 +866,11 @@ country_display = country_summary[
         "avg_total_spend",
         "avg_property_price",
         "avg_properties",
-        "avg_satisfaction"
+        "avg_satisfaction",
+        "investment_rate"
     ]
 ].copy()
+
 
 country_display.columns = [
     "Country",
@@ -758,15 +878,16 @@ country_display.columns = [
     "Average Total Spend",
     "Average Property Price",
     "Average Properties",
-    "Average Satisfaction"
+    "Average Satisfaction",
+    "Investment Rate"
 ]
+
 
 st.dataframe(
     country_display,
     use_container_width=True,
     hide_index=True
-)
-# ---------------------------------------------------------
+)# ---------------------------------------------------------
 # FOOTER
 # ---------------------------------------------------------
 

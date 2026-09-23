@@ -309,7 +309,152 @@ if total_buyers == 0:
     )
 
     st.stop()
+# =========================================================
+# EXECUTIVE OVERVIEW
+# =========================================================
 
+st.markdown(
+    '<div class="section-header">Executive Overview</div>',
+    unsafe_allow_html=True
+)
+
+
+# ---------------------------------------------------------
+# CALCULATE KPI VALUES
+# ---------------------------------------------------------
+
+overview_buyers = len(filtered_data)
+
+overview_investment_rate = (
+    filtered_data["is_investor"].mean() * 100
+)
+
+overview_avg_spend = (
+    filtered_data["total_spend"].mean()
+)
+
+overview_avg_properties = (
+    filtered_data["total_properties"].mean()
+)
+
+
+# ---------------------------------------------------------
+# CREATE FOUR KPI COLUMNS
+# ---------------------------------------------------------
+
+overview_col1, overview_col2, overview_col3, overview_col4 = st.columns(4)
+
+
+# ---------------------------------------------------------
+# KPI 1 — TOTAL BUYERS
+# ---------------------------------------------------------
+
+with overview_col1:
+
+    st.markdown(
+        f"""
+        <div class="kpi-card">
+
+            <div class="kpi-label">
+                Total Buyers
+            </div>
+
+            <div class="kpi-value">
+                {overview_buyers:,}
+            </div>
+
+            <div class="kpi-description">
+                Current filtered population
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ---------------------------------------------------------
+# KPI 2 — INVESTMENT RATE
+# ---------------------------------------------------------
+
+with overview_col2:
+
+    st.markdown(
+        f"""
+        <div class="kpi-card">
+
+            <div class="kpi-label">
+                Investment Rate
+            </div>
+
+            <div class="kpi-value">
+                {overview_investment_rate:.1f}%
+            </div>
+
+            <div class="kpi-description">
+                Buyers acquiring for investment
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ---------------------------------------------------------
+# KPI 3 — AVERAGE TOTAL SPEND
+# ---------------------------------------------------------
+
+with overview_col3:
+
+    st.markdown(
+        f"""
+        <div class="kpi-card">
+
+            <div class="kpi-label">
+                Average Total Spend
+            </div>
+
+            <div class="kpi-value">
+                ${overview_avg_spend:,.0f}
+            </div>
+
+            <div class="kpi-description">
+                Average cumulative property spend
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ---------------------------------------------------------
+# KPI 4 — AVERAGE PROPERTIES
+# ---------------------------------------------------------
+
+with overview_col4:
+
+    st.markdown(
+        f"""
+        <div class="kpi-card">
+
+            <div class="kpi-label">
+                Average Properties
+            </div>
+
+            <div class="kpi-value">
+                {overview_avg_properties:.2f}
+            </div>
+
+            <div class="kpi-description">
+                Properties per buyer
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 # ---------------------------------------------------------
 # SEGMENT DISTRIBUTION

@@ -1198,7 +1198,290 @@ st.plotly_chart(
     country_spend_chart,
     use_container_width=True
 )
-    
+
+# =========================================================
+# PROFESSIONAL DASHBOARD SUMMARY / KEY INSIGHTS
+# =========================================================
+
+st.header("💡 Professional Dashboard Summary")
+
+st.write(
+    "Automatically generated insights based on the "
+    "currently selected dashboard filters."
+)
+
+
+# ---------------------------------------------------------
+# PREPARE SUMMARY DATA
+# ---------------------------------------------------------
+
+summary_data = filtered_data.copy()
+
+
+# ---------------------------------------------------------
+# BASIC SUMMARY METRICS
+# ---------------------------------------------------------
+
+summary_total_buyers = len(summary_data)
+
+summary_investment_rate = (
+    summary_data["is_investor"].mean() * 100
+)
+
+summary_average_spend = (
+    summary_data["total_spend"].mean()
+)
+
+summary_average_properties = (
+    summary_data["total_properties"].mean()
+)
+
+
+# ---------------------------------------------------------
+# LARGEST SEGMENT
+# ---------------------------------------------------------
+
+summary_segment_counts = (
+    summary_data["segment"]
+    .value_counts()
+)
+
+largest_segment = (
+    summary_segment_counts.idxmax()
+)
+
+largest_segment_count = (
+    summary_segment_counts.max()
+)
+
+largest_segment_percentage = (
+    largest_segment_count
+    / summary_total_buyers
+    * 100
+)
+
+
+# ---------------------------------------------------------
+# HIGHEST-SPENDING SEGMENT
+# ---------------------------------------------------------
+
+summary_segment_spend = (
+    summary_data
+    .groupby("segment")["total_spend"]
+    .mean()
+)
+
+highest_spending_segment = (
+    summary_segment_spend.idxmax()
+)
+
+highest_spending_value = (
+    summary_segment_spend.max()
+)
+
+
+# ---------------------------------------------------------
+# MOST ACTIVE SEGMENT
+# ---------------------------------------------------------
+
+summary_segment_properties = (
+    summary_data
+    .groupby("segment")["total_properties"]
+    .mean()
+)
+
+most_active_segment = (
+    summary_segment_properties.idxmax()
+)
+
+most_active_properties = (
+    summary_segment_properties.max()
+)
+
+
+# ---------------------------------------------------------
+# LARGEST COUNTRY
+# ---------------------------------------------------------
+
+summary_country_counts = (
+    summary_data["country"]
+    .value_counts()
+)
+
+largest_country = (
+    summary_country_counts.idxmax()
+)
+
+largest_country_count = (
+    summary_country_counts.max()
+)
+
+largest_country_percentage = (
+    largest_country_count
+    / summary_total_buyers
+    * 100
+)
+
+
+# ---------------------------------------------------------
+# KPI CARDS
+# ---------------------------------------------------------
+
+insight_col1, insight_col2, insight_col3 = st.columns(3)
+
+
+with insight_col1:
+
+    st.metric(
+        "👥 Filtered Buyers",
+        f"{summary_total_buyers:,}"
+    )
+
+
+with insight_col2:
+
+    st.metric(
+        "📈 Investment Rate",
+        f"{summary_investment_rate:.1f}%"
+    )
+
+
+with insight_col3:
+
+    st.metric(
+        "💰 Average Total Spend",
+        f"${summary_average_spend:,.0f}"
+    )
+
+
+# ---------------------------------------------------------
+# KEY BUSINESS INDICATORS
+# ---------------------------------------------------------
+
+st.subheader("📊 Key Business Indicators")
+
+
+indicator_col1, indicator_col2 = st.columns(2)
+
+
+with indicator_col1:
+
+    st.info(
+        f"🏆 **Largest Buyer Segment**\n\n"
+        f"{largest_segment}\n\n"
+        f"{largest_segment_count:,} buyers "
+        f"({largest_segment_percentage:.1f}% of the "
+        f"filtered population)"
+    )
+
+
+with indicator_col2:
+
+    st.info(
+        f"💰 **Highest Average Spending Segment**\n\n"
+        f"{highest_spending_segment}\n\n"
+        f"Average total spend: "
+        f"${highest_spending_value:,.0f}"
+    )
+
+
+indicator_col3, indicator_col4 = st.columns(2)
+
+
+with indicator_col3:
+
+    st.info(
+        f"🏠 **Most Active Segment**\n\n"
+        f"{most_active_segment}\n\n"
+        f"Average properties purchased: "
+        f"{most_active_properties:.2f}"
+    )
+
+
+with indicator_col4:
+
+    st.info(
+        f"🌎 **Largest Buyer Country**\n\n"
+        f"{largest_country}\n\n"
+        f"{largest_country_count:,} buyers "
+        f"({largest_country_percentage:.1f}% of the "
+        f"filtered population)"
+    )
+
+
+# ---------------------------------------------------------
+# AUTOMATIC KEY INSIGHTS
+# ---------------------------------------------------------
+
+st.subheader("🔎 Key Insights")
+
+
+insight_text_1 = (
+    f"The largest buyer segment is **{largest_segment}**, "
+    f"representing {largest_segment_percentage:.1f}% "
+    f"of the currently filtered buyer population."
+)
+
+
+insight_text_2 = (
+    f"**{highest_spending_segment}** has the highest "
+    f"average total spend at "
+    f"${highest_spending_value:,.0f} per buyer."
+)
+
+
+insight_text_3 = (
+    f"**{most_active_segment}** shows the highest average "
+    f"property activity, with "
+    f"{most_active_properties:.2f} properties per buyer."
+)
+
+
+insight_text_4 = (
+    f"**{largest_country}** represents the largest "
+    f"buyer population in the current filtered dataset, "
+    f"with {largest_country_count:,} buyers."
+)
+
+
+insight_text_5 = (
+    f"The current filtered population has an overall "
+    f"investment rate of {summary_investment_rate:.1f}% "
+    f"and average total spend of "
+    f"${summary_average_spend:,.0f}."
+)
+
+
+st.markdown(
+    f"""
+- {insight_text_1}
+- {insight_text_2}
+- {insight_text_3}
+- {insight_text_4}
+- {insight_text_5}
+"""
+)
+
+
+# ---------------------------------------------------------
+# MANAGEMENT INTERPRETATION
+# ---------------------------------------------------------
+
+st.subheader("📌 Management Interpretation")
+
+st.write(
+    "The dashboard summarizes observable buyer behavior "
+    "within the selected population. Segment differences "
+    "should be interpreted as descriptive patterns in the "
+    "available data rather than causal relationships."
+)
+
+
+st.caption(
+    "Insights update automatically when dashboard filters "
+    "are changed."
+)
+
 # ---------------------------------------------------------
 # FOOTER
 # ---------------------------------------------------------

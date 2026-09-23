@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
+import plotly.express as px
 
 
 # ---------------------------------------------------------
@@ -633,7 +634,138 @@ st.dataframe(
     hide_index=True
 )
 
+# =========================================================
+# INTERACTIVE WORLD MAP BY COUNTRY
+# =========================================================
 
+st.header("🌍 Interactive World Map")
+
+st.write(
+    "Explore the distribution of buyers across countries. "
+    "Use the selector below to change the metric displayed on the map."
+)
+
+# Country name to ISO-3 country code
+country_codes = {
+    "USA": "USA",
+    "UK": "GBR",
+    "Canada": "CAN",
+    "Germany": "DEU",
+    "France": "FRA",
+    "Belgium": "BEL",
+    "Mexico": "MEX",
+    "Australia": "AUS",
+    "Russia": "RUS",
+    "Denmark": "DNK"
+}
+
+# Create country-level summary
+country_summary = (
+    buyer_data
+    .groupby("country")
+    .agg(
+        buyer_count=("client_id", "count"),
+        avg_total_spend=("total_spend", "mean"),
+        avg_property_price=("average_property_price", "mean"),
+        avg_properties=("total_properties", "mean"),
+        avg_satisfaction=("satisfaction_score", "mean")
+    )
+    .reset_index()
+)
+
+# Add ISO country codes
+country_summary["iso_code"] = (
+    country_summary["country"].map(country_codes)
+)
+
+# Map metric selector
+map_metric = st.selectbox(
+    "Select map metric",
+    [
+        "Number of Buyers",
+        "Average Total Spend",
+        "Average Property Price",
+        "Average Properties",
+        "Average Satisfaction"
+    ]
+)
+
+# Match the selected option to a dataframe column
+metric_mapping = {
+    "Number of Buyers": "buyer_count",
+    "Average Total Spend": "avg_total_spend",
+    "Average Property Price": "avg_property_price",
+    "Average Properties": "avg_properties",
+    "Average Satisfaction": "avg_satisfaction"
+}
+
+selected_metric = metric_mapping[map_metric]
+
+# Create interactive world map
+fig_map = px.choropleth(
+    country_summary,
+    locations="iso_code",
+    color=selected_metric,
+    hover_name="country",
+    locationmode="ISO-3",
+    projection="natural earth",
+    color_continuous_scale="Blues"
+)
+
+# Map appearance
+fig_map.update_layout(
+    height=600,
+    margin=dict(
+        l=0,
+        r=0,
+        t=30,
+        b=0
+    ),
+    geo=dict(
+        showframe=False,
+        showcoastlines=True,
+        projection_type="natural earth"
+    ),
+    coloraxis_colorbar=dict(
+        title=map_metric
+    )
+)
+
+# Display map
+st.plotly_chart(
+    fig_map,
+    use_container_width=True
+)
+
+
+# Country summary table
+st.subheader("Country-Level Summary")
+
+country_display = country_summary[
+    [
+        "country",
+        "buyer_count",
+        "avg_total_spend",
+        "avg_property_price",
+        "avg_properties",
+        "avg_satisfaction"
+    ]
+].copy()
+
+country_display.columns = [
+    "Country",
+    "Buyers",
+    "Average Total Spend",
+    "Average Property Price",
+    "Average Properties",
+    "Average Satisfaction"
+]
+
+st.dataframe(
+    country_display,
+    use_container_width=True,
+    hide_index=True
+)
 # ---------------------------------------------------------
 # FOOTER
 # ---------------------------------------------------------

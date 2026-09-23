@@ -354,7 +354,6 @@ with overview_col1:
     st.markdown(
         f"""
         <div class="kpi-card">
-
             <div class="kpi-label">
                 Total Buyers
             </div>
@@ -366,7 +365,6 @@ with overview_col1:
             <div class="kpi-description">
                 Current filtered population
             </div>
-
         </div>
         """,
         unsafe_allow_html=True

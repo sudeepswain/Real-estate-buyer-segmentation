@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import plotly.express as px
 
 
@@ -160,7 +159,7 @@ def load_data():
 buyer_data, segment_profile = load_data()
 
 
-st.success("Data loaded successfully!")
+st.caption("Data loaded successfully.")
 
 
 # ---------------------------------------------------------
@@ -239,220 +238,73 @@ filtered_data = buyer_data[
 
 
 # ---------------------------------------------------------
-# DASHBOARD OVERVIEW
-# ---------------------------------------------------------
-
-st.header("📊 Buyer Segmentation Overview")
-
-
-total_buyers = len(filtered_data)
-
-number_segments = (
-    filtered_data["segment"].nunique()
-    if total_buyers > 0
-    else 0
-)
-
-number_countries = (
-    filtered_data["country"].nunique()
-    if total_buyers > 0
-    else 0
-)
-
-average_spend = (
-    filtered_data["total_spend"].mean()
-    if total_buyers > 0
-    else 0
-)
-
-
-col1, col2, col3, col4 = st.columns(4)
-
-
-with col1:
-    st.metric(
-        "Total Buyers",
-        f"{total_buyers:,}"
-    )
-
-
-with col2:
-    st.metric(
-        "Buyer Segments",
-        number_segments
-    )
-
-
-with col3:
-    st.metric(
-        "Countries",
-        number_countries
-    )
-
-
-with col4:
-    st.metric(
-        "Average Total Spend",
-        f"${average_spend:,.0f}"
-    )
-
-
-# ---------------------------------------------------------
-# STOP IF NO DATA
-# ---------------------------------------------------------
-
-if total_buyers == 0:
-
-    st.warning(
-        "No buyers match the selected filters. "
-        "Please change the filters in the sidebar."
-    )
-
-    st.stop()
-# =========================================================
 # EXECUTIVE OVERVIEW
-# =========================================================
+# ---------------------------------------------------------
 
 st.markdown(
     '<div class="section-header">Executive Overview</div>',
     unsafe_allow_html=True
 )
 
+total_buyers = len(filtered_data)
 
-# ---------------------------------------------------------
-# CALCULATE KPI VALUES
-# ---------------------------------------------------------
+if total_buyers == 0:
+    st.warning(
+        "No buyers match the selected filters. "
+        "Please change the filters in the sidebar."
+    )
+    st.stop()
 
-overview_buyers = len(filtered_data)
-
-overview_investment_rate = (
-    filtered_data["is_investor"].mean() * 100
-)
-
-overview_avg_spend = (
-    filtered_data["total_spend"].mean()
-)
-
-overview_avg_properties = (
-    filtered_data["total_properties"].mean()
-)
-
-
-# ---------------------------------------------------------
-# CREATE FOUR KPI COLUMNS
-# ---------------------------------------------------------
+overview_investment_rate = filtered_data["is_investor"].mean() * 100
+overview_avg_spend = filtered_data["total_spend"].mean()
+overview_avg_properties = filtered_data["total_properties"].mean()
 
 overview_col1, overview_col2, overview_col3, overview_col4 = st.columns(4)
 
-
-# ---------------------------------------------------------
-# KPI 1 — TOTAL BUYERS
-# ---------------------------------------------------------
-
 with overview_col1:
-
-    st.markdown(
-        f"""
-        <div class="kpi-card">
-            <div class="kpi-label">
-                Total Buyers
-            </div>
-
-            <div class="kpi-value">
-                {overview_buyers:,}
-            </div>
-
-            <div class="kpi-description">
-                Current filtered population
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-# ---------------------------------------------------------
-# KPI 2 — INVESTMENT RATE
-# ---------------------------------------------------------
+    st.metric("👥 Total Buyers", f"{total_buyers:,}")
 
 with overview_col2:
-
-    st.markdown(
-        f"""
-        <div class="kpi-card">
-
-            <div class="kpi-label">
-                Investment Rate
-            </div>
-
-            <div class="kpi-value">
-                {overview_investment_rate:.1f}%
-            </div>
-
-            <div class="kpi-description">
-                Buyers acquiring for investment
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-# ---------------------------------------------------------
-# KPI 3 — AVERAGE TOTAL SPEND
-# ---------------------------------------------------------
+    st.metric("📈 Investment Rate", f"{overview_investment_rate:.1f}%")
 
 with overview_col3:
-
-    st.markdown(
-        f"""
-        <div class="kpi-card">
-
-            <div class="kpi-label">
-                Average Total Spend
-            </div>
-
-            <div class="kpi-value">
-                ${overview_avg_spend:,.0f}
-            </div>
-
-            <div class="kpi-description">
-                Average cumulative property spend
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-# ---------------------------------------------------------
-# KPI 4 — AVERAGE PROPERTIES
-# ---------------------------------------------------------
+    st.metric("💰 Average Total Spend", f"${overview_avg_spend:,.0f}")
 
 with overview_col4:
+    st.metric("🏠 Average Properties", f"{overview_avg_properties:.2f}")
 
-    st.markdown(
-        f"""
-        <div class="kpi-card">
+st.caption("Executive metrics reflect the current sidebar filters.")
 
-            <div class="kpi-label">
-                Average Properties
-            </div>
 
-            <div class="kpi-value">
-                {overview_avg_properties:.2f}
-            </div>
+# ---------------------------------------------------------
+# CHART FORMATTING
+# ---------------------------------------------------------
 
-            <div class="kpi-description">
-                Properties per buyer
-            </div>
+segment_colors = {
+    "High-Activity Investment-Oriented Buyers": "#1f77b4",
+    "Mainstream Lower-Value Buyers": "#6b7280",
+    "Higher-Value Property Buyers": "#0f766e",
+}
 
-        </div>
-        """,
-        unsafe_allow_html=True
+def format_chart(fig, title=None):
+    if title:
+        fig.update_layout(
+            title={"text": title, "x": 0, "xanchor": "left"}
+        )
+
+    fig.update_layout(
+        template="plotly_white",
+        font=dict(family="Arial", size=12),
+        title_font=dict(size=17),
+        margin=dict(l=20, r=20, t=60, b=25),
+        hoverlabel=dict(font_size=12),
     )
+
+    fig.update_xaxes(showgrid=False, title_font=dict(size=12))
+    fig.update_yaxes(gridcolor="#eeeeee", title_font=dict(size=12))
+
+    return fig
+
 
 # ---------------------------------------------------------
 # SEGMENT DISTRIBUTION
@@ -475,17 +327,27 @@ segment_counts.columns = [
 
 fig_segment = px.bar(
     segment_counts,
-    x="segment",
-    y="buyer_count",
-    title="Number of Buyers by Segment",
-    text="buyer_count"
+    x="buyer_count",
+    y="segment",
+    orientation="h",
+    text="buyer_count",
+    color="segment",
+    color_discrete_map=segment_colors,
+    title="Buyer Distribution by Segment"
+)
+
+fig_segment.update_traces(
+    texttemplate="%{text:,}",
+    textposition="outside"
 )
 
 fig_segment.update_layout(
-    xaxis_title="Buyer Segment",
-    yaxis_title="Number of Buyers",
+    xaxis_title="Number of Buyers",
+    yaxis_title="Buyer Segment",
     showlegend=False
 )
+
+fig_segment = format_chart(fig_segment)
 
 st.plotly_chart(
     fig_segment,
@@ -521,7 +383,7 @@ with behavior_col1:
         purpose_data,
         names="purpose",
         values="buyer_count",
-        title="Acquisition Purpose"
+        title="Acquisition Purpose of Buyers"
     )
 
     st.plotly_chart(
@@ -544,7 +406,7 @@ with behavior_col2:
         spend_data,
         x="segment",
         y="total_spend",
-        title="Average Total Spend by Segment",
+        title="Average Total Spend by Buyer Segment",
         text_auto=".2s"
     )
 

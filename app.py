@@ -13,7 +13,110 @@ st.set_page_config(
     page_icon="🏠",
     layout="wide"
 )
+# =========================================================
+# PROFESSIONAL DASHBOARD STYLING
+# =========================================================
 
+st.markdown(
+    """
+    <style>
+
+    /* Main page */
+    .main {
+        padding-top: 1rem;
+    }
+
+    /* Dashboard title */
+    .dashboard-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 0.2rem;
+    }
+
+    .dashboard-subtitle {
+        font-size: 1rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Section headers */
+    .section-header {
+        font-size: 1.35rem;
+        font-weight: 650;
+        margin-top: 1.5rem;
+        margin-bottom: 0.8rem;
+    }
+
+    /* KPI cards */
+    .kpi-card {
+        background-color: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px;
+        min-height: 120px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+
+    .kpi-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+
+    .kpi-value {
+        font-size: 1.65rem;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .kpi-description {
+        font-size: 0.78rem;
+        color: #6b7280;
+        margin-top: 5px;
+    }
+
+    /* Insight cards */
+    .insight-card {
+        background-color: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 10px;
+    }
+
+    .insight-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
+
+    .insight-value {
+        font-size: 1rem;
+        font-weight: 650;
+        color: #111827;
+    }
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {
+        border-right: 1px solid #e5e7eb;
+    }
+
+    /* Dataframes */
+    [data-testid="stDataFrame"] {
+        border-radius: 8px;
+    }
+
+    /* Remove excessive top spacing */
+    div.block-container {
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # ---------------------------------------------------------
 # TITLE

@@ -118,17 +118,26 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ---------------------------------------------------------
-# TITLE
-# ---------------------------------------------------------
 
-st.title("🏠 Real Estate Buyer Segmentation & Investment Profiling")
+# =========================================================
+# DASHBOARD HEADER
+# =========================================================
 
-st.write(
-    "Interactive dashboard for analyzing buyer segments, "
-    "investment behavior, spending patterns, and geographic distribution."
+st.markdown(
+    '<div class="dashboard-title">'
+    'Real Estate Buyer Intelligence Dashboard'
+    '</div>',
+    unsafe_allow_html=True
 )
 
+st.markdown(
+    '<div class="dashboard-subtitle">'
+    'Buyer segmentation, investment behavior and geographic market intelligence'
+    '</div>',
+    unsafe_allow_html=True
+)
+
+st.divider()
 
 # ---------------------------------------------------------
 # LOAD DATA

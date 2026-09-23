@@ -887,6 +887,315 @@ st.dataframe(
     country_display,
     use_container_width=True,
     hide_index=True
+
+# =========================================================
+# COUNTRY → SEGMENT ANALYSIS
+# =========================================================
+
+st.header("🎯 Country → Buyer Segment Analysis")
+
+st.write(
+    "Select a country to examine its buyer segments, "
+    "investment behavior, spending patterns, and property activity."
+)
+
+
+# ---------------------------------------------------------
+# COUNTRY SELECTION
+# ---------------------------------------------------------
+
+available_countries = sorted(
+    filtered_data["country"].dropna().unique()
+)
+
+selected_country = st.selectbox(
+    "Select a country",
+    available_countries,
+    key="country_segment_analysis"
+)
+
+
+# ---------------------------------------------------------
+# FILTER DATA FOR SELECTED COUNTRY
+# ---------------------------------------------------------
+
+country_data = filtered_data[
+    filtered_data["country"] == selected_country
+].copy()
+
+
+# ---------------------------------------------------------
+# COUNTRY OVERVIEW
+# ---------------------------------------------------------
+
+st.subheader(
+    f"📍 {selected_country} Buyer Overview"
+)
+
+
+country_col1, country_col2, country_col3, country_col4 = st.columns(4)
+
+
+with country_col1:
+
+    st.metric(
+        "Total Buyers",
+        f"{len(country_data):,}"
+    )
+
+
+with country_col2:
+
+    st.metric(
+        "Investment Rate",
+        f"{country_data['is_investor'].mean() * 100:.1f}%"
+    )
+
+
+with country_col3:
+
+    st.metric(
+        "Average Total Spend",
+        f"${country_data['total_spend'].mean():,.0f}"
+    )
+
+
+with country_col4:
+
+    st.metric(
+        "Average Properties",
+        f"{country_data['total_properties'].mean():.2f}"
+    )
+
+
+# ---------------------------------------------------------
+# SEGMENT DISTRIBUTION
+# ---------------------------------------------------------
+
+st.subheader(
+    f"Buyer Segments in {selected_country}"
+)
+
+
+country_segment_counts = (
+    country_data["segment"]
+    .value_counts()
+    .reset_index()
+)
+
+country_segment_counts.columns = [
+    "segment",
+    "buyer_count"
+]
+
+
+# Segment percentage
+country_segment_counts["percentage"] = (
+    country_segment_counts["buyer_count"]
+    / country_segment_counts["buyer_count"].sum()
+    * 100
+)
+
+
+# ---------------------------------------------------------
+# SEGMENT PIE CHART
+# ---------------------------------------------------------
+
+segment_pie = px.pie(
+    country_segment_counts,
+    names="segment",
+    values="buyer_count",
+    title=f"Buyer Segment Distribution — {selected_country}",
+    hole=0.35
+)
+
+
+segment_pie.update_traces(
+    textinfo="percent+label"
+)
+
+
+st.plotly_chart(
+    segment_pie,
+    use_container_width=True
+)
+
+
+# ---------------------------------------------------------
+# SEGMENT BEHAVIOR
+# ---------------------------------------------------------
+
+st.subheader(
+    f"Segment Behavior in {selected_country}"
+)
+
+
+country_segment_profile = (
+    country_data
+    .groupby("segment")
+    .agg(
+        buyers=("client_id", "count"),
+
+        avg_age=("age", "mean"),
+
+        avg_properties=("total_properties", "mean"),
+
+        avg_total_spend=("total_spend", "mean"),
+
+        avg_property_price=(
+            "average_property_price",
+            "mean"
+        ),
+
+        avg_area=(
+            "average_area_sqft",
+            "mean"
+        ),
+
+        investment_rate=(
+            "is_investor",
+            "mean"
+        ),
+
+        loan_rate=(
+            "loan_flag",
+            "mean"
+        ),
+
+        avg_satisfaction=(
+            "satisfaction_score",
+            "mean"
+        )
+    )
+    .reset_index()
+)
+
+
+# Convert rates to percentages
+country_segment_profile["investment_rate"] = (
+    country_segment_profile["investment_rate"] * 100
+)
+
+country_segment_profile["loan_rate"] = (
+    country_segment_profile["loan_rate"] * 100
+)
+
+
+# ---------------------------------------------------------
+# FORMAT DISPLAY TABLE
+# ---------------------------------------------------------
+
+country_segment_display = (
+    country_segment_profile.copy()
+)
+
+
+country_segment_display.columns = [
+    "Buyer Segment",
+    "Buyers",
+    "Average Age",
+    "Average Properties",
+    "Average Total Spend",
+    "Average Property Price",
+    "Average Area",
+    "Investment Rate",
+    "Loan Rate",
+    "Average Satisfaction"
+]
+
+
+country_segment_display[
+    "Average Age"
+] = country_segment_display[
+    "Average Age"
+].round(1)
+
+
+country_segment_display[
+    "Average Properties"
+] = country_segment_display[
+    "Average Properties"
+].round(2)
+
+
+country_segment_display[
+    "Average Total Spend"
+] = country_segment_display[
+    "Average Total Spend"
+].round(0)
+
+
+country_segment_display[
+    "Average Property Price"
+] = country_segment_display[
+    "Average Property Price"
+].round(0)
+
+
+country_segment_display[
+    "Average Area"
+] = country_segment_display[
+    "Average Area"
+].round(0)
+
+
+country_segment_display[
+    "Investment Rate"
+] = country_segment_display[
+    "Investment Rate"
+].round(1)
+
+
+country_segment_display[
+    "Loan Rate"
+] = country_segment_display[
+    "Loan Rate"
+].round(1)
+
+
+country_segment_display[
+    "Average Satisfaction"
+] = country_segment_display[
+    "Average Satisfaction"
+].round(2)
+
+
+st.dataframe(
+    country_segment_display,
+    use_container_width=True,
+    hide_index=True
+)
+
+
+# ---------------------------------------------------------
+# SPENDING BY SEGMENT
+# ---------------------------------------------------------
+
+st.subheader(
+    f"Average Spending by Segment — {selected_country}"
+)
+
+
+country_spend_chart = px.bar(
+    country_segment_profile,
+    x="segment",
+    y="avg_total_spend",
+    title="Average Total Spend by Buyer Segment",
+    text_auto=".2s"
+)
+
+
+country_spend_chart.update_layout(
+    xaxis_title="Buyer Segment",
+    yaxis_title="Average Total Spend ($)"
+)
+
+
+st.plotly_chart(
+    country_spend_chart,
+    use_container_width=True
+)
+    
 )# ---------------------------------------------------------
 # FOOTER
 # ---------------------------------------------------------
